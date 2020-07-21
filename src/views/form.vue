@@ -10,6 +10,7 @@
           @click="showVillage = true"
           title="  所属小区"
           :value="form.villageName"
+          :rules="[{ required: true, message: '请选择所属小区' }]"
         >
         </van-cell>
 
@@ -29,18 +30,21 @@
 
         <van-field
           v-model="form.buildNum"
-          name="楼栋号"
+          class="bt"
           label="楼栋号"
           placeholder="楼栋号"
+          :rules="[{ required: true, message: '请输入楼栋号' }]"
         />
+
         <van-field
           v-model="form.numberPlate"
-          name="门牌号"
+          class="bt"
           label="门牌号"
           placeholder="门牌号"
+          :rules="[{ required: true, message: '请输入楼栋号' }]"
         />
         <div class="radio">
-          <span class="label">房屋类型</span>
+          <span class="label bt">房屋类型</span>
           <div class="radio-box">
             <van-radio-group v-model="form.housesType">
               <van-radio name="1">自住</van-radio>
@@ -52,7 +56,7 @@
       </div>
       <div class="card">
         <div class="radio">
-          <span class="label">居民类型</span>
+          <span class="label bt">居民类型</span>
           <div class="radio-box">
             <van-radio-group v-model="form.residentType">
               <van-radio name="1">业主</van-radio>
@@ -64,12 +68,14 @@
 
         <van-field
           v-model="form.name"
+          class="bt"
           name="姓名"
           label="姓名"
           placeholder="姓名"
+          :rules="[{ required: true, message: '请输入姓名' }]"
         />
         <div class="radio">
-          <span class="label">性别</span>
+          <span class="label bt">性别</span>
           <div class="radio-box">
             <van-radio-group v-model="form.sexType">
               <van-radio name="1">男</van-radio>
@@ -80,6 +86,7 @@
 
         <van-cell
           is-link
+          class="bt"
           @click="showPopupBirthday"
           title="出生日期"
           :value="birthdayFilter"
@@ -102,6 +109,7 @@
 
         <van-field
           v-model="form.identityCard"
+          class="bt"
           name="身份证"
           label="身份证"
           placeholder="身份证"
@@ -109,6 +117,7 @@
 
         <van-field
           v-model="form.tel"
+          class="bt"
           type="form.tel"
           name="手机号"
           label="手机号"
@@ -118,6 +127,7 @@
         <van-cell
           is-link
           @click="showPopupLevelOfEducation"
+          class="bt"
           title="文化程度"
           :value="form.levelOfEducation"
         ></van-cell>
@@ -134,12 +144,23 @@
             @cancle="showLevelOfEducation = false"
           />
         </van-popup>
+
+        <div class="radio">
+          <span class="label bt">党员是否</span>
+          <div class="radio-box">
+            <van-radio-group v-model="form.isDy">
+              <van-radio name="是">是</van-radio>
+              <van-radio name="否">否</van-radio>
+            </van-radio-group>
+          </div>
+        </div>
       </div>
 
       <div class="card">
         <van-cell
           is-link
           @click="showPopupRelation"
+          class="bt"
           title="与户主关系"
           :value="form.relation"
         ></van-cell>
@@ -161,8 +182,10 @@
         <van-field
           v-model="form.address"
           name="户口所在地"
+          class="bt"
           label="户口所在地"
           placeholder="户口所在地"
+          :rules="[{ required: true, message: '请输入户口所在地' }]"
         />
 
         <van-cell
@@ -187,6 +210,10 @@
             :max-date="maxDate"
           />
         </van-popup>
+      </div>
+
+      <div class="card">
+        <van-field v-model="form.tag" label="特殊标签" placeholder="特殊标签" />
       </div>
 
       <div class="card">
@@ -238,7 +265,7 @@
           placeholder="职务"
         />
       </div>
-      <div class="card" style="margin-bottom: 80px">
+      <div class="card">
         <van-field
           v-model="form.remarks"
           rows="2"
@@ -247,10 +274,13 @@
           placeholder="备注信息"
         />
       </div>
-      
-      <div class="btn" native-type="submit">保存</div>
+      <div style="width: 100%; height: 60px;"></div>
+      <van-button class="btn" round block type="info" native-type="submit">
+        保存
+      </van-button>
+
+      <!-- <div class="btn" native-type="submit">保存</div> -->
     </van-form>
-    
   </div>
 </template>
 
@@ -289,12 +319,14 @@ export default {
         housesType: "1",
         residentType: "1",
         address: "",
+        isDy: "",
         liaisonMan: "",
         liaisonManTel: "",
         familyDoctor: "",
         familyDoctorTel: "",
         placeWork: "",
         post: "",
+        tag: "",
         remarks: "",
         sexType: "1",
         upDateEdit: null,
@@ -365,7 +397,7 @@ export default {
     },
     onConfirmVillage(e) {
       this.form.villageName = e;
-      this.showVillage = false
+      this.showVillage = false;
     },
     onConfirmRelation(e) {
       console.log("e: ", e);
@@ -389,15 +421,49 @@ export default {
     },
     onChangeRelation(e) {
       console.log("e: ", e);
-    },
-  },
+    }
+  }
 };
 </script>
+<style>
+.van-nav-bar i.van-icon {
+  color: #000;
+}
+.btn.van-button--round {
+  border-radius: 0;
+  background-image: linear-gradient(to right, #00e8db, #00ea7f);
+  border: none;
+}
+.van-radio__icon i.van-icon {
+  border: 1px solid #c8c9cc;
+}
+.van-radio__icon--checked i.van-icon-success {
+  background-color: #00e8db;
+  border-color: #00e8db !important;
+}
+.bt .van-field__label {
+  padding-left: 10px;
+  position: relative;
+}
+span.bt {
+  padding-left: 10px;
+  position: relative;
+}
+.bt .van-field__label::after,
+.bt::after {
+  content: "*";
+  color:  #F5222D;
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 4px;
+}
+</style>
 <style scoped lang="scss">
 ::v-deep .van-radio__icon--checked .van-icon.van-radio__icon--checked {
   color: #fff;
-  background-color: #00E8DB !important;
-  border-color: #00E8DB !important;
+  background-color: #00e8db !important;
+  border-color: #00e8db !important;
 }
 .page {
   background: #f7f4f8;
@@ -405,9 +471,16 @@ export default {
   position: relative;
   .bt {
     .van-cell__title {
+      box-sizing: border-box;
       padding-left: 10px;
-      ::after {
-        
+      position: relative;
+      &::after {
+        content: "*";
+        color:  #F5222D;
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 4px;
       }
     }
   }
@@ -417,7 +490,7 @@ export default {
     width: 100%;
     bottom: 0;
     left: 0;
-    background-image: linear-gradient(to right, #00E8DB,  #00EA7F );
+    background-image: linear-gradient(to right, #00e8db, #00ea7f);
     line-height: 50px;
     text-align: center;
     color: #fff;
@@ -429,6 +502,9 @@ export default {
   border-radius: 10px;
   padding: 10px 0;
   margin: 0 auto 10px auto;
+  .van-cell:last-child::after {
+    border-bottom: none;
+  }
 }
 .van-cell {
   .van-cell__title {
@@ -454,6 +530,7 @@ export default {
     margin-right: 12px;
     font-size: 14px;
     text-align: left;
+    box-sizing: border-box;
   }
   .radio-box {
     flex: 1;
