@@ -391,6 +391,7 @@ export default {
   },
   watch: {},
   created() {
+    this.get()
     if (this.$route.query.infoId !== undefined) {
       this.isEdit = true;
       this.infoId = this.$route.query.infoId;
@@ -414,6 +415,7 @@ export default {
           o[item.name] = {}
         }
       });
+      console.log('o: ', o)
     },
     del(i) {
       this.form.tag.splice(i, 1);
