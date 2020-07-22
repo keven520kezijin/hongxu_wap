@@ -1,11 +1,12 @@
 <template>
   <div class="about">
     <van-nav-bar title="登记列表" fixed />
-    <div class="card">
+    <div class="card" v-if="info">
       <van-swipe-cell v-for="(item, i) of info" :key="i">
         <van-cell-group class="box" @click="go(i)">
           <van-cell class="t" :value="addr(item)" />
           <van-cell class="m" :value="`登记时间：${item.upDateEdit}--${i}`" />
+          <van-icon name="arrow" class="arrow" />
         </van-cell-group>
         <template #right>
           <van-button
@@ -17,6 +18,9 @@
           />
         </template>
       </van-swipe-cell>
+    </div>
+    <div v-else class="card">
+      暂无数据
     </div>
     <div class="btn" @click="goDj">居民登记</div>
   </div>
@@ -49,7 +53,7 @@ export default {
       this.$router.push({ name: "Home" });
     },
     del(i) {
-      console.log("i: ", i);
+      // console.log("i: ", i);
       // return
       // this.info = this.info.splice(i,1);
 
@@ -58,27 +62,50 @@ export default {
       localStorage.setItem("info", JSON.stringify(this.info));
     },
     go(i) {
-      console.log("i: ", i);
-      this.$router.push({ name: "Info", params: { infoId: i } });
+      // console.log("i: ", i);
+      this.$router.push({ name: "Home", query: { infoId: i } });
     },
     addr(item) {
-      console.log("item: ", item);
-      return `${item.villageName} ${item.buildNum}号楼 ${item.numberPlate}号`;
+      // console.log("item: ", item);
+      return `${item.villageName}/${item.buildNum}号楼/${item.numberPlate}室`;
     },
   },
 };
 </script>
 <style>
+.van-swipe-cell{
+  border-bottom: 1px solid #ebedf0;
+}
+.van-swipe-cell:last-child {
+  border: none;
+}
+[class*=van-hairline]::after {
+  border: none;
+}
 .van-cell-group {
   padding: 20px 0;
 }
 .van-cell::after {
   border: none;
 }
+.box {
+  position: relative;
+}
+.box .arrow.van-icon {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(0, 0, 0, 0.15);
+}
 </style>
 <style lang="scss">
 ::v-deep .box {
   padding: 10px 0;
+  position: relative;
+  .arrow {
+    position: absolute;
+  }
 }
 .t {
   font-size: 16px;

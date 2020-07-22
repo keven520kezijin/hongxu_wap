@@ -1,7 +1,7 @@
 <!--  -->
 <template>
   <div class="page">
-    <van-nav-bar title="居民登记" fixed left-arrow />
+    <van-nav-bar title="居民登记" fixed left-arrow @click-left="onClickLeft" />
     <van-form @submit="onSubmit">
       <div class="card">
         <van-cell
@@ -55,7 +55,7 @@
         </div>
       </div>
       <div class="card">
-        <div class="radio">
+        <div class="radio" style="border-bottom: 1px #f5f5f5 solid;">
           <span class="label bt">居民类型</span>
           <div class="radio-box">
             <van-radio-group v-model="form.residentType">
@@ -74,7 +74,7 @@
           placeholder="姓名"
           :rules="[{ required: true, message: '请输入姓名' }]"
         />
-        <div class="radio">
+        <div class="radio" style="border-bottom: 1px #f5f5f5 solid;">
           <span class="label bt">性别</span>
           <div class="radio-box">
             <van-radio-group v-model="form.sexType">
@@ -113,15 +113,17 @@
           name="身份证"
           label="身份证"
           placeholder="身份证"
+          :rules="[{ validator: validatorSfz, message: '请输入有效身份证' }]"
         />
 
         <van-field
           v-model="form.tel"
           class="bt"
-          type="form.tel"
+          type="tel"
           name="手机号"
           label="手机号"
           placeholder="手机号"
+          :rules="[{ validator, message: '请输入正确手机号' }]"
         />
 
         <van-cell
@@ -213,7 +215,13 @@
       </div>
 
       <div class="card">
-        <van-field v-model="form.tag" label="特殊标签" placeholder="特殊标签" />
+        <van-field v-model="tsTag" label="特殊标签" placeholder="特殊标签" />
+        <div class="tag-box">
+          <span class="tag" v-for="(item, i) in form.tag" :key="i"
+            >{{ item }} <van-icon class="err" name="cross" @click="del(i)"
+          /></span>
+          <span style="clear: both"></span>
+        </div>
       </div>
 
       <div class="card">
@@ -226,7 +234,7 @@
 
         <van-field
           v-model="form.liaisonManTel"
-          type="form.tel"
+          type="tel"
           name="手机号"
           label="手机号"
           placeholder="手机号"
@@ -242,7 +250,7 @@
 
         <van-field
           v-model="form.familyDoctorTel"
-          type="form.tel"
+          type="tel"
           name="手机号"
           label="手机号"
           placeholder="手机号"
@@ -271,7 +279,9 @@
           rows="2"
           type="textarea"
           name="备注信息"
+          maxlength="1000"
           placeholder="备注信息"
+          show-word-limit
         />
       </div>
       <div style="width: 100%; height: 60px;"></div>
@@ -295,6 +305,9 @@ export default {
   components: {},
   data() {
     return {
+      infoId: "",
+      tsTag: "",
+      isEdit: false,
       minDate: new Date(1949, 0, 1),
       maxDate: new Date(2025, 10, 1),
       currentDate: new Date(),
@@ -306,6 +319,34 @@ export default {
       columnsVillage: ["虹旭小区", "虹旭二小区", "虹警新苑", "中星雅苑"],
       columnsLevelOfEducation: ["高中", "大专", "本科", "硕士", "博士"],
       columnsRelation: ["夫妻", "父子", "父女", "母子", "母女", "其他"],
+      industry_list: [
+        {
+          parent_ind: "女装",
+          name: "连衣裙",
+        },
+        {
+          name: "女装",
+        },
+        {
+          parent_ind: "女装",
+          name: "半身裙",
+        },
+        {
+          parent_ind: "女装",
+          name: "A字裙",
+        },
+        {
+          name: "数码",
+        },
+        {
+          parent_ind: "数码",
+          name: "电脑配件",
+        },
+        {
+          parent_ind: "电脑配件",
+          name: "内存",
+        },
+      ],
       form: {
         buildNum: "",
         numberPlate: "",
@@ -313,20 +354,20 @@ export default {
         identityCard: "",
         relation: "",
         tel: "",
-        birthday: null,
+        birthday: dayjs("2020-1-1"),
         updateTime: null,
         levelOfEducation: "",
         housesType: "1",
         residentType: "1",
         address: "",
-        isDy: "",
+        isDy: "是",
         liaisonMan: "",
         liaisonManTel: "",
         familyDoctor: "",
         familyDoctorTel: "",
         placeWork: "",
         post: "",
-        tag: "",
+        tag: [],
         remarks: "",
         sexType: "1",
         upDateEdit: null,
@@ -349,7 +390,14 @@ export default {
     },
   },
   watch: {},
-  created() {},
+  created() {
+    if (this.$route.query.infoId !== undefined) {
+      this.isEdit = true;
+      this.infoId = this.$route.query.infoId;
+      this.form = JSON.parse(localStorage.getItem("info"))[this.infoId];
+      console.log("form: ", this.form);
+    }
+  },
   mounted() {},
   beforeCreate() {},
   beforeMount() {},
@@ -359,6 +407,30 @@ export default {
   destroyed() {},
   activated() {},
   methods: {
+    get() {
+      let o = {}
+      this.industry_list.forEach(item => {
+        if (item.parent_ind === undefined) {
+          o[item.name] = {}
+        }
+      });
+    },
+    del(i) {
+      this.form.tag.splice(i, 1);
+    },
+    onClickLeft() {
+      this.$router.go(-1);
+    },
+    validatorSfz(val) {
+      return (
+        /^[1-9][0-9]{5}(19|20)[0-9]{2}((01|03|05|07|08|10|12)(0[1-9]|[1-2][0-9]|31)|(04|06|09|11)(0[1-9]|[1-2][0-9]|30)|02(0[1-9]|[1-2][0-9]))[0-9]{3}([0-9]|x|X)$/.test(
+          val
+        ) && val !== ""
+      );
+    },
+    validator(val) {
+      return /^1(3|4|5|7|8)\d{9}$/.test(val) && val !== "";
+    },
     onConfirmLevelOfEducation(e) {
       console.log("onConfirmLevelOfEducation-e: ", e);
       this.form.levelOfEducation = e;
@@ -369,18 +441,25 @@ export default {
       console.log("form: ", this.form);
       const param = this.form;
       param.formId = this.formId;
+      if (this.tsTag) {
+        param.tag.push(this.tsTag);
+      }
       param.upDateEdit = dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss");
       console.log("param: ", param);
       let info = localStorage.getItem("info");
-      if (info) {
+      if (this.isEdit) {
         info = JSON.parse(info);
-        info.push(param);
-        localStorage.setItem("info", JSON.stringify(info));
+        info[this.infoId] = param;
       } else {
-        info = [];
-        info.push(param);
-        localStorage.setItem("info", JSON.stringify(info));
+        if (info) {
+          info = JSON.parse(info);
+          info.push(param);
+        } else {
+          info = [];
+          info.push(param);
+        }
       }
+      localStorage.setItem("info", JSON.stringify(info));
       this.$router.push({ name: "About" });
     },
     showPopupUpdateTime() {
@@ -421,11 +500,18 @@ export default {
     },
     onChangeRelation(e) {
       console.log("e: ", e);
-    }
-  }
+    },
+  },
 };
 </script>
 <style>
+.radio .radio-box .van-radio-group .van-radio[data-v-902d4c44] {
+  padding-right: 10px;
+  font-size: 12px !important;
+}
+.card .van-cell::after {
+  border: none !important;
+}
 .van-nav-bar i.van-icon {
   color: #000;
 }
@@ -452,11 +538,11 @@ span.bt {
 .bt .van-field__label::after,
 .bt::after {
   content: "*";
-  color:  #F5222D;
+  color: #f5222d;
   display: block;
   position: absolute;
   left: 0;
-  top: 4px;
+  top: 3px;
 }
 </style>
 <style scoped lang="scss">
@@ -476,11 +562,11 @@ span.bt {
       position: relative;
       &::after {
         content: "*";
-        color:  #F5222D;
+        color: #f5222d;
         display: block;
         position: absolute;
         left: 0;
-        top: 4px;
+        top: 3px;
       }
     }
   }
@@ -502,8 +588,31 @@ span.bt {
   border-radius: 10px;
   padding: 10px 0;
   margin: 0 auto 10px auto;
-  .van-cell:last-child::after {
-    border-bottom: none;
+  .tag-box {
+    padding: 10px 16px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .tag {
+    display: inline-block;
+    padding: 0 10px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 12px;
+    background: #f3f3f3;
+    border-radius: 4px;
+    text-align: center;
+    margin: 0 10px 10px 0;
+    float: left;
+    .err {
+      margin-left: 10px;
+    }
+  }
+  .van-cell {
+    border-bottom: 1px #f5f5f5 solid;
+    &:last-child {
+      border-bottom: none;
+    }
   }
 }
 .van-cell {
